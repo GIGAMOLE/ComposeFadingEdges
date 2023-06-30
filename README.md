@@ -5,7 +5,7 @@
 
 # ComposeFadingEdges
 
-The `ComposeFadingEdges` is a powerful Android Compose library that seamlessly incorporates customisable fading edges with horizontal or vertical orientations, static or scrollable dynamic content, clipping or color drawing mechanism.
+The `ComposeFadingEdges` is a powerful Android Compose library that seamlessly incorporates customisable fading edges with horizontal or vertical orientations, static or scrollable content, clip or color draw.
 
 ![](/media/demo.gif)
 
