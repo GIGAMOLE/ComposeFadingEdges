@@ -5,8 +5,7 @@
 
 # ComposeFadingEdges
 
-The `ComposeFadingEdges` is a powerful Android Compose library that seamlessly incorporates customisable fading edges with horizontal or vertical orientations, static or
-scrollable dynamic content, clipping or color drawing mechanism.
+The `ComposeFadingEdges` is a powerful Android Compose library that seamlessly incorporates customisable fading edges with horizontal or vertical orientations, static or scrollable dynamic content, clipping or color drawing mechanism.
 
 ![](/media/demo.gif)
 
@@ -114,8 +113,7 @@ This `Modifier` comes with common [fading edges params](#Fading-Edges-Modifiers)
 
 |Param|Description|
 |-|-|
-|`isMarqueeAutoLayout`|Determines whether the `horizontalFadingEdges(...)` and text marquee should be automatically aligned during the layout process to accommodate
-additional text paddings required for proper fading edges drawing.|
+|`isMarqueeAutoLayout`|Determines whether the `horizontalFadingEdges(...)` and text marquee should be automatically aligned during the layout process to accommodate additional text paddings required for proper fading edges drawing.|
 |`marqueeProvider`|The custom or default `basicMarquee` provider.|
 
 ## License
