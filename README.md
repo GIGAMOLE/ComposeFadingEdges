@@ -12,7 +12,7 @@ scrollable dynamic content, clipping or color drawing mechanism.
 
 Features:
 
-- **Multiple Modifiers:** Add fading edges with customizable options for orientation, gravity, length, content type, and fill type.
+- **Multiple Modifiers:** Add fading edges with custom orientation, gravity, length, content and fill type.
 - **Different Contents:** Support for static, scrollable, and lazy list content types.
 - **Scrolling Settings:** Configure fading edges scroll behavior with dynamic, full, or static settings.
 - **Adjustable Fade:** Choose between fade clip or fade color fill types for fading edges.
@@ -72,6 +72,8 @@ The fading edges `Modifiers` are available for different content orientation and
 |`fillType`|The [`FadingEdgesFillType`](#FadingEdgesFillType).|
 
 In case, `contentType` is not provided, the `FadingEdgesContentType` equals to `Static`.
+
+The `ComposeFadingEdges` also provides fading edges for [text marquee](#Modifier.marqueeHorizontalFadingEdges).
 
 ### FadingEdgesContentType
 

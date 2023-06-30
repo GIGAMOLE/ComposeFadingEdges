@@ -161,7 +161,7 @@ fun MainScreenDemoContent() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.Black),
+            .background(color = Color.White),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -184,12 +184,13 @@ fun MainScreenDemoContent() {
                 Text(
                     modifier = Modifier
                         .width(width = 250.dp)
-                        .background(color = Color.White)
+                        .background(color = Color(0xFF9FDAFF))
                         .padding(
                             horizontal = 32.dp,
                             vertical = 32.dp
                         ),
                     text = "Compose\nFading\nEdges",
+                    color = Color(0xFF007AC9),
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamilySpaceGrotesk
@@ -201,7 +202,7 @@ fun MainScreenDemoContent() {
                     modifier = Modifier
                         .width(width = 250.dp)
                         .marqueeHorizontalFadingEdges(isMarqueeAutoLayout = false) {
-                            background(color = Color.White)
+                            background(color = Color(0xFFFEECF4))
                                 .basicMarquee(
                                     delayMillis = initialDelay.toInt(),
                                     spacing = MarqueeSpacing.fractionOfContainer(fraction = 0.05F),
@@ -213,6 +214,7 @@ fun MainScreenDemoContent() {
                                 )
                         },
                     text = "Enrich Android Compose UI with fading edges",
+                    color = Color(0xFFE21776),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Normal,
                     fontFamily = FontFamilyOpenSans
