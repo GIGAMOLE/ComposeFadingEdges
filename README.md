@@ -73,7 +73,7 @@ The fading edges `Modifiers` are available for different content orientation and
 
 In case, `contentType` is not provided, the `FadingEdgesContentType` equals to `Static`.
 
-The `ComposeFadingEdges` also provides fading edges for [text marquee](#Modifier.marqueeHorizontalFadingEdges).
+The `ComposeFadingEdges` also provides fading edges for [text marquee](#modifiermarqueehorizontalfadingedges).
 
 ### FadingEdgesContentType
 
