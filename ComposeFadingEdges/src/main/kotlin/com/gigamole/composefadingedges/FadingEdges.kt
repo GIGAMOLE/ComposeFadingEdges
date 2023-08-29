@@ -10,10 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
+import androidx.compose.foundation.lazy.grid.LazyGridLayoutInfo
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLayoutInfo
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -36,8 +43,9 @@ import com.gigamole.composefadingedges.content.FadingEdgesContentType
 import com.gigamole.composefadingedges.content.scrollconfig.FadingEdgesScrollConfig
 import com.gigamole.composefadingedges.content.scrollconfig.FadingEdgesScrollConfigDefaults
 import com.gigamole.composefadingedges.fill.FadingEdgesFillType
-import java.lang.Float.min
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.min
 
 /**
  * The utility [Modifier] to add fading edges to the text marquee (custom or default [basicMarquee]).
@@ -150,7 +158,7 @@ fun Modifier.horizontalFadingEdges(
  *
  * This [Modifier] should be added before the [horizontalScroll].
  *
- * @param contentType The [FadingEdgesContentType.Scroll] content type for a [horizontalScroll] container.
+ * @param contentType The [FadingEdgesContentType.Dynamic.Scroll] content type for a [horizontalScroll] container.
  * @param gravity The [FadingEdgesGravity].
  * @param length The fading edges length.
  * @param fillType The [FadingEdgesFillType].
@@ -158,7 +166,7 @@ fun Modifier.horizontalFadingEdges(
  * @author GIGAMOLE
  */
 fun Modifier.horizontalFadingEdges(
-    contentType: FadingEdgesContentType.Scroll,
+    contentType: FadingEdgesContentType.Dynamic.Scroll,
     gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
     length: Dp = FadingEdgesDefaults.Length,
     fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
@@ -172,7 +180,7 @@ fun Modifier.horizontalFadingEdges(
 /**
  * The [Modifier] to add horizontal [fadingEdges] to a [LazyRow].
  *
- * @param contentType The [FadingEdgesContentType.LazyList] content type.
+ * @param contentType The [FadingEdgesContentType.Dynamic.Lazy.List] content type.
  * @param gravity The [FadingEdgesGravity].
  * @param length The fading edges length.
  * @param fillType The [FadingEdgesFillType].
@@ -180,7 +188,51 @@ fun Modifier.horizontalFadingEdges(
  * @author GIGAMOLE
  */
 fun Modifier.horizontalFadingEdges(
-    contentType: FadingEdgesContentType.LazyList,
+    contentType: FadingEdgesContentType.Dynamic.Lazy.List,
+    gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
+    length: Dp = FadingEdgesDefaults.Length,
+    fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
+): Modifier = horizontalFadingEdges(
+    gravity = gravity,
+    length = length,
+    contentType = contentType as FadingEdgesContentType,
+    fillType = fillType
+)
+
+/**
+ * The [Modifier] to add horizontal [fadingEdges] to a [LazyHorizontalGrid].
+ *
+ * @param contentType The [FadingEdgesContentType.Dynamic.Lazy.Grid] content type.
+ * @param gravity The [FadingEdgesGravity].
+ * @param length The fading edges length.
+ * @param fillType The [FadingEdgesFillType].
+ * @return The [Modifier] with horizontal [fadingEdges].
+ * @author GIGAMOLE
+ */
+fun Modifier.horizontalFadingEdges(
+    contentType: FadingEdgesContentType.Dynamic.Lazy.Grid,
+    gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
+    length: Dp = FadingEdgesDefaults.Length,
+    fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
+): Modifier = horizontalFadingEdges(
+    gravity = gravity,
+    length = length,
+    contentType = contentType as FadingEdgesContentType,
+    fillType = fillType
+)
+
+/**
+ * The [Modifier] to add horizontal [fadingEdges] to a [LazyHorizontalStaggeredGrid].
+ *
+ * @param contentType The [FadingEdgesContentType.Dynamic.Lazy.StaggeredGrid] content type.
+ * @param gravity The [FadingEdgesGravity].
+ * @param length The fading edges length.
+ * @param fillType The [FadingEdgesFillType].
+ * @return The [Modifier] with horizontal [fadingEdges].
+ * @author GIGAMOLE
+ */
+fun Modifier.horizontalFadingEdges(
+    contentType: FadingEdgesContentType.Dynamic.Lazy.StaggeredGrid,
     gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
     length: Dp = FadingEdgesDefaults.Length,
     fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
@@ -241,7 +293,7 @@ fun Modifier.verticalFadingEdges(
  *
  * This [Modifier] should be added before the [verticalScroll].
  *
- * @param contentType The [FadingEdgesContentType.Scroll] content type for a [verticalScroll] container.
+ * @param contentType The [FadingEdgesContentType.Dynamic.Scroll] content type for a [verticalScroll] container.
  * @param gravity The [FadingEdgesGravity].
  * @param length The fading edges length.
  * @param fillType The [FadingEdgesFillType].
@@ -249,7 +301,7 @@ fun Modifier.verticalFadingEdges(
  * @author GIGAMOLE
  */
 fun Modifier.verticalFadingEdges(
-    contentType: FadingEdgesContentType.Scroll,
+    contentType: FadingEdgesContentType.Dynamic.Scroll,
     gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
     length: Dp = FadingEdgesDefaults.Length,
     fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
@@ -263,7 +315,7 @@ fun Modifier.verticalFadingEdges(
 /**
  * The [Modifier] to add vertical [fadingEdges] to a [LazyColumn].
  *
- * @param contentType The [FadingEdgesContentType.LazyList] content type.
+ * @param contentType The [FadingEdgesContentType.Dynamic.Lazy.List] content type.
  * @param gravity The [FadingEdgesGravity].
  * @param length The fading edges length.
  * @param fillType The [FadingEdgesFillType].
@@ -271,7 +323,51 @@ fun Modifier.verticalFadingEdges(
  * @author GIGAMOLE
  */
 fun Modifier.verticalFadingEdges(
-    contentType: FadingEdgesContentType.LazyList,
+    contentType: FadingEdgesContentType.Dynamic.Lazy.List,
+    gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
+    length: Dp = FadingEdgesDefaults.Length,
+    fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
+): Modifier = verticalFadingEdges(
+    gravity = gravity,
+    length = length,
+    contentType = contentType as FadingEdgesContentType,
+    fillType = fillType
+)
+
+/**
+ * The [Modifier] to add vertical [fadingEdges] to a [LazyVerticalGrid].
+ *
+ * @param contentType The [FadingEdgesContentType.Dynamic.Lazy.Grid] content type.
+ * @param gravity The [FadingEdgesGravity].
+ * @param length The fading edges length.
+ * @param fillType The [FadingEdgesFillType].
+ * @return The [Modifier] with vertical [fadingEdges].
+ * @author GIGAMOLE
+ */
+fun Modifier.verticalFadingEdges(
+    contentType: FadingEdgesContentType.Dynamic.Lazy.Grid,
+    gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
+    length: Dp = FadingEdgesDefaults.Length,
+    fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
+): Modifier = verticalFadingEdges(
+    gravity = gravity,
+    length = length,
+    contentType = contentType as FadingEdgesContentType,
+    fillType = fillType
+)
+
+/**
+ * The [Modifier] to add vertical [fadingEdges] to a [LazyVerticalStaggeredGrid].
+ *
+ * @param contentType The [FadingEdgesContentType.Dynamic.Lazy.StaggeredGrid] content type.
+ * @param gravity The [FadingEdgesGravity].
+ * @param length The fading edges length.
+ * @param fillType The [FadingEdgesFillType].
+ * @return The [Modifier] with vertical [fadingEdges].
+ * @author GIGAMOLE
+ */
+fun Modifier.verticalFadingEdges(
+    contentType: FadingEdgesContentType.Dynamic.Lazy.StaggeredGrid,
     gravity: FadingEdgesGravity = FadingEdgesDefaults.Gravity,
     length: Dp = FadingEdgesDefaults.Length,
     fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
@@ -361,208 +457,509 @@ internal fun Modifier.fadingEdges(
     val lengthPx = with(LocalDensity.current) { length.toPx() }
 
     when (contentType) {
-        is FadingEdgesContentType.Scroll -> {
-            with(contentType) {
-                var scrollStartLength by remember { mutableStateOf(0.0F) }
-                var scrollEndLength by remember { mutableStateOf(0.0F) }
+        is FadingEdgesContentType.Dynamic -> {
+            var scrollStartLength by remember { mutableFloatStateOf(0.0F) }
+            var scrollEndLength by remember { mutableFloatStateOf(0.0F) }
 
-                val rawStartScroll by derivedStateOf {
-                    scrollState.value.toFloat()
-                }
-                val rawEndScroll by derivedStateOf {
-                    (scrollState.maxValue - scrollState.value).toFloat()
-                }
+            when (contentType) {
+                is FadingEdgesContentType.Dynamic.Scroll -> {
+                    with(contentType) {
+                        val rawStartScroll = state.value.toFloat()
+                        val rawEndScroll = (state.maxValue - state.value).toFloat()
 
-                when (scrollConfig) {
-                    is FadingEdgesScrollConfig.Dynamic -> {
-                        val maxScroll = scrollState.maxValue.toFloat()
-                        val dynamicStartScroll: Float
-                        val dynamicEndScroll: Float
+                        when (scrollConfig) {
+                            is FadingEdgesScrollConfig.Dynamic -> {
+                                val maxScroll = state.maxValue.toFloat()
+                                val dynamicStartScroll: Float
+                                val dynamicEndScroll: Float
 
-                        if (scrollConfig.isLerpByDifferenceForPartialContent && maxScroll > 0 && maxScroll <= lengthPx) {
-                            dynamicStartScroll = lengthPx * (rawStartScroll / maxScroll).coerceIn(0.0F, 1.0F)
-                            dynamicEndScroll = lengthPx * (rawEndScroll / maxScroll).coerceIn(0.0F, 1.0F)
-                        } else {
-                            dynamicStartScroll = rawStartScroll
-                            dynamicEndScroll = rawEndScroll
+                                if (scrollConfig.isLerpByDifferenceForPartialContent && maxScroll > 0 && maxScroll <= lengthPx) {
+                                    dynamicStartScroll = lengthPx * (rawStartScroll / maxScroll).coerceIn(0.0F, 1.0F)
+                                    dynamicEndScroll = lengthPx * (rawEndScroll / maxScroll).coerceIn(0.0F, 1.0F)
+                                } else {
+                                    dynamicStartScroll = rawStartScroll
+                                    dynamicEndScroll = rawEndScroll
+                                }
+
+                                scrollStartLength = lengthPx * ((dynamicStartScroll / lengthPx) * scrollConfig.scrollFactor).coerceIn(0.0F, 1.0F)
+                                scrollEndLength = lengthPx * ((dynamicEndScroll / lengthPx) * scrollConfig.scrollFactor).coerceIn(0.0F, 1.0F)
+                            }
+                            is FadingEdgesScrollConfig.Full -> {
+                                scrollStartLength = if (state.canScrollBackward) {
+                                    lengthPx
+                                } else {
+                                    0.0F
+                                }
+                                scrollEndLength = if (state.canScrollForward) {
+                                    lengthPx
+                                } else {
+                                    0.0F
+                                }
+                            }
+                            is FadingEdgesScrollConfig.Static -> {
+                                if (isScrollPossible) {
+                                    scrollStartLength = lengthPx
+                                    scrollEndLength = lengthPx
+                                } else {
+                                    scrollStartLength = 0.0F
+                                    scrollEndLength = 0.0F
+                                }
+                            }
                         }
-
-                        scrollStartLength = lengthPx * ((dynamicStartScroll / lengthPx) * scrollConfig.scrollFactor).coerceIn(0.0F, 1.0F)
-                        scrollEndLength = lengthPx * ((dynamicEndScroll / lengthPx) * scrollConfig.scrollFactor).coerceIn(0.0F, 1.0F)
                     }
-                    is FadingEdgesScrollConfig.Full -> {
-                        scrollStartLength = if (scrollState.canScrollBackward) {
-                            lengthPx
-                        } else {
-                            0.0F
+                }
+                is FadingEdgesContentType.Dynamic.Lazy.List -> {
+                    with(contentType) {
+                        val layoutInfo = state.layoutInfo
+                        val lazyListScrollStartLength = run {
+                            val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
+                                0.0F
+                            } else {
+                                when (scrollConfig) {
+                                    is FadingEdgesScrollConfig.Dynamic -> {
+                                        val firstItem = layoutInfo.visibleItemsInfo.first()
+
+                                        if (firstItem.index > 0) {
+                                            1.0F
+                                        } else {
+                                            val firstItemSize = firstItem.size
+                                            val minLength = if (firstItemSize == 0) {
+                                                lengthPx
+                                            } else {
+                                                min(lengthPx, firstItemSize.toFloat())
+                                            }
+
+                                            var lerpLength = minLength
+
+                                            if (scrollConfig.isLerpByDifferenceForPartialContent &&
+                                                firstItem.index == 0 &&
+                                                state.canScrollBackward &&
+                                                layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
+                                            ) {
+                                                lerpLength = lerpLazyListPartialContentByDifference(
+                                                    layoutInfo = layoutInfo,
+                                                    lerpLength = lerpLength,
+                                                    minLength = minLength
+                                                )
+                                            }
+
+                                            abs(firstItem.offset).toFloat() / lerpLength * scrollConfig.scrollFactor
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Full -> {
+                                        if (state.canScrollBackward) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Static -> {
+                                        if (isScrollPossible) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                }
+                            }.coerceIn(0.0F, 1.0F)
+
+                            fraction * lengthPx
                         }
-                        scrollEndLength = if (scrollState.canScrollForward) {
-                            lengthPx
-                        } else {
-                            0.0F
+                        val lazyListScrollEndLength = run {
+                            val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
+                                0.0F
+                            } else {
+                                when (scrollConfig) {
+                                    is FadingEdgesScrollConfig.Dynamic -> {
+                                        val lastItem = layoutInfo.visibleItemsInfo.last()
+
+                                        if (lastItem.index < layoutInfo.totalItemsCount - 1) {
+                                            1.0F
+                                        } else {
+                                            val lastItemSize = lastItem.size
+                                            val minLength = if (lastItemSize == 0) {
+                                                lengthPx
+                                            } else {
+                                                min(lengthPx, lastItemSize.toFloat())
+                                            }
+
+                                            var lerpLength = minLength
+
+                                            if (scrollConfig.isLerpByDifferenceForPartialContent &&
+                                                lastItem.index == layoutInfo.totalItemsCount - 1 &&
+                                                state.canScrollForward &&
+                                                layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
+                                            ) {
+                                                lerpLength = lerpLazyListPartialContentByDifference(
+                                                    layoutInfo = layoutInfo,
+                                                    lerpLength = lerpLength,
+                                                    minLength = minLength
+                                                )
+                                            }
+
+                                            val lastItemOffset = lastItem.size + lastItem.offset + layoutInfo.beforeContentPadding - layoutInfo.viewportEndOffset
+
+                                            lastItemOffset / lerpLength * scrollConfig.scrollFactor
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Full -> {
+                                        if (state.canScrollForward) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Static -> {
+                                        if (isScrollPossible) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                }
+                            }.coerceIn(0.0F, 1.0F)
+
+                            fraction * lengthPx
                         }
-                    }
-                    is FadingEdgesScrollConfig.Static -> {
-                        if (scrollState.canScrollForward || scrollState.canScrollBackward) {
-                            scrollStartLength = lengthPx
-                            scrollEndLength = lengthPx
-                        } else {
-                            scrollStartLength = 0.0F
-                            scrollEndLength = 0.0F
-                        }
+
+                        scrollStartLength = lazyListScrollStartLength
+                        scrollEndLength = lazyListScrollEndLength
                     }
                 }
+                is FadingEdgesContentType.Dynamic.Lazy.Grid -> {
+                    with(contentType) {
+                        val layoutInfo = state.layoutInfo
+                        val entriesCount = ceil(layoutInfo.totalItemsCount.toFloat() / spanCount.toFloat()).toInt()
 
-                val animationSpec = scrollConfig.animationSpec
-                if (animationSpec == null) {
-                    startLength = scrollStartLength
-                    endLength = scrollEndLength
-                } else {
-                    startLength = animateFloatAsState(
-                        targetValue = scrollStartLength,
-                        animationSpec = animationSpec
-                    ).value
-                    endLength = animateFloatAsState(
-                        targetValue = scrollEndLength,
-                        animationSpec = animationSpec
-                    ).value
+                        fun LazyGridItemInfo.entryIndex(): Int {
+                            return when (layoutInfo.orientation) {
+                                Orientation.Vertical -> {
+                                    row
+                                }
+                                Orientation.Horizontal -> {
+                                    column
+                                }
+                            }
+                        }
+
+                        fun LazyGridItemInfo.entryOffset(): Int {
+                            return when (layoutInfo.orientation) {
+                                Orientation.Vertical -> {
+                                    offset.y
+                                }
+                                Orientation.Horizontal -> {
+                                    offset.x
+                                }
+                            }
+                        }
+
+                        fun List<LazyGridItemInfo>.entrySize(): Int {
+                            return maxOf {
+                                when (layoutInfo.orientation) {
+                                    Orientation.Vertical -> {
+                                        it.size.height
+                                    }
+                                    Orientation.Horizontal -> {
+                                        it.size.width
+                                    }
+                                }
+                            }
+                        }
+
+                        val lazyGridScrollStartLength = run {
+                            val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
+                                0.0F
+                            } else {
+                                when (scrollConfig) {
+                                    is FadingEdgesScrollConfig.Dynamic -> {
+                                        val firstItem = layoutInfo.visibleItemsInfo.first()
+                                        val firstEntryIndex = firstItem.entryIndex()
+
+                                        if (firstEntryIndex > 0) {
+                                            1.0F
+                                        } else {
+                                            val firstEntrySize = layoutInfo.visibleItemsInfo.take(spanCount).entrySize()
+                                            val minLength = if (firstEntrySize == 0) {
+                                                lengthPx
+                                            } else {
+                                                min(lengthPx, firstEntrySize.toFloat())
+                                            }
+
+                                            var lerpLength = minLength
+
+                                            if (scrollConfig.isLerpByDifferenceForPartialContent &&
+                                                firstEntryIndex == 0 &&
+                                                state.canScrollBackward &&
+                                                layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
+                                            ) {
+                                                lerpLength = lerpLazyGridPartialContentByDifference(
+                                                    layoutInfo = layoutInfo,
+                                                    spanCount = spanCount,
+                                                    lerpLength = lerpLength,
+                                                    minLength = minLength
+                                                )
+                                            }
+
+                                            abs(firstItem.entryOffset()).toFloat() / lerpLength * scrollConfig.scrollFactor
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Full -> {
+                                        if (state.canScrollBackward) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Static -> {
+                                        if (isScrollPossible) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                }
+                            }.coerceIn(0.0F, 1.0F)
+
+                            fraction * lengthPx
+                        }
+                        val lazyGridScrollEndLength = run {
+                            val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
+                                0.0F
+                            } else {
+                                when (scrollConfig) {
+                                    is FadingEdgesScrollConfig.Dynamic -> {
+                                        val lastItem = layoutInfo.visibleItemsInfo.last()
+                                        val lastEntryIndex = lastItem.entryIndex()
+
+                                        if (lastEntryIndex < entriesCount - 1) {
+                                            1.0F
+                                        } else {
+                                            val lastEntrySize = layoutInfo.visibleItemsInfo.takeLastWhile {
+                                                when (layoutInfo.orientation) {
+                                                    Orientation.Vertical -> {
+                                                        it.row == lastEntryIndex
+                                                    }
+                                                    Orientation.Horizontal -> {
+                                                        it.column == lastEntryIndex
+                                                    }
+                                                }
+                                            }.entrySize()
+                                            val minLength = if (lastEntrySize == 0) {
+                                                lengthPx
+                                            } else {
+                                                min(lengthPx, lastEntrySize.toFloat())
+                                            }
+
+                                            var lerpLength = minLength
+
+                                            if (scrollConfig.isLerpByDifferenceForPartialContent &&
+                                                lastEntryIndex == entriesCount - 1 &&
+                                                state.canScrollForward &&
+                                                layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
+                                            ) {
+                                                lerpLength = lerpLazyGridPartialContentByDifference(
+                                                    layoutInfo = layoutInfo,
+                                                    spanCount = spanCount,
+                                                    lerpLength = lerpLength,
+                                                    minLength = minLength
+                                                )
+                                            }
+
+                                            val lastItemOffset = lastEntrySize + lastItem.entryOffset() + layoutInfo.beforeContentPadding - layoutInfo.viewportEndOffset
+
+                                            lastItemOffset / lerpLength * scrollConfig.scrollFactor
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Full -> {
+                                        if (state.canScrollForward) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Static -> {
+                                        if (isScrollPossible) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                }
+                            }.coerceIn(0.0F, 1.0F)
+
+                            fraction * lengthPx
+                        }
+
+                        scrollStartLength = lazyGridScrollStartLength
+                        scrollEndLength = lazyGridScrollEndLength
+                    }
+                }
+                is FadingEdgesContentType.Dynamic.Lazy.StaggeredGrid -> {
+                    with(contentType) {
+                        val layoutInfo = state.layoutInfo
+
+                        fun LazyStaggeredGridItemInfo.itemSize(): Int {
+                            return when (layoutInfo.orientation) {
+                                Orientation.Vertical -> {
+                                    size.height
+                                }
+                                Orientation.Horizontal -> {
+                                    size.width
+                                }
+                            }
+                        }
+
+                        fun LazyStaggeredGridItemInfo.itemOffset(): Int {
+                            return when (layoutInfo.orientation) {
+                                Orientation.Vertical -> {
+                                    offset.y
+                                }
+                                Orientation.Horizontal -> {
+                                    offset.x
+                                }
+                            }
+                        }
+
+                        val lazyStaggeredGridScrollStartLength = run {
+                            val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
+                                0.0F
+                            } else {
+                                when (scrollConfig) {
+                                    is FadingEdgesScrollConfig.Dynamic -> {
+                                        val firstItem = layoutInfo.visibleItemsInfo.first()
+
+                                        if (firstItem.index > 0) {
+                                            1.0F
+                                        } else {
+                                            val firstItemSize = firstItem.itemSize()
+                                            val minLength = if (firstItemSize == 0) {
+                                                lengthPx
+                                            } else {
+                                                min(lengthPx, firstItemSize.toFloat())
+                                            }
+
+                                            var lerpLength = minLength
+
+                                            if (scrollConfig.isLerpByDifferenceForPartialContent &&
+                                                firstItem.index == 0 &&
+                                                state.canScrollBackward &&
+                                                layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
+                                            ) {
+                                                lerpLength = lerpLazyStaggeredGridPartialContentByDifference(
+                                                    layoutInfo = layoutInfo,
+                                                    lerpLength = lerpLength,
+                                                    minLength = minLength
+                                                )
+                                            }
+
+                                            abs(firstItem.itemOffset()).toFloat() / lerpLength * scrollConfig.scrollFactor
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Full -> {
+                                        if (state.canScrollBackward) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Static -> {
+                                        if (isScrollPossible) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                }
+                            }.coerceIn(0.0F, 1.0F)
+
+                            fraction * lengthPx
+                        }
+                        val lazyStaggeredGridScrollEndLength = run {
+                            val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
+                                0.0F
+                            } else {
+                                when (scrollConfig) {
+                                    is FadingEdgesScrollConfig.Dynamic -> {
+                                        val rawLastItem = layoutInfo.visibleItemsInfo.last()
+                                        val isRealLastItemVisible = rawLastItem.index == layoutInfo.totalItemsCount - 1
+                                        val lastItem = if (isRealLastItemVisible) {
+                                            layoutInfo.visibleItemsInfo.findLast {
+                                                (it.itemOffset() + it.itemSize()) > (rawLastItem.itemOffset() + rawLastItem.itemSize())
+                                            } ?: rawLastItem
+                                        } else {
+                                            rawLastItem
+                                        }
+
+                                        if (isRealLastItemVisible.not()) {
+                                            1.0F
+                                        } else {
+                                            val lastItemSize = lastItem.itemSize()
+                                            val minLength = if (lastItemSize == 0) {
+                                                lengthPx
+                                            } else {
+                                                min(lengthPx, lastItemSize.toFloat())
+                                            }
+
+                                            var lerpLength = minLength
+
+                                            if (scrollConfig.isLerpByDifferenceForPartialContent &&
+                                                state.canScrollForward &&
+                                                layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
+                                            ) {
+                                                lerpLength = lerpLazyStaggeredGridPartialContentByDifference(
+                                                    layoutInfo = layoutInfo,
+                                                    lerpLength = lerpLength,
+                                                    minLength = minLength
+                                                )
+                                            }
+
+                                            val lastItemOffset =
+                                                lastItem.itemSize() + lastItem.itemOffset() + layoutInfo.beforeContentPadding - layoutInfo.viewportEndOffset
+
+                                            lastItemOffset / lerpLength * scrollConfig.scrollFactor
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Full -> {
+                                        if (state.canScrollForward) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                    is FadingEdgesScrollConfig.Static -> {
+                                        if (isScrollPossible) {
+                                            1.0F
+                                        } else {
+                                            0.0F
+                                        }
+                                    }
+                                }
+                            }.coerceIn(0.0F, 1.0F)
+
+                            fraction * lengthPx
+                        }
+
+                        scrollStartLength = lazyStaggeredGridScrollStartLength
+                        scrollEndLength = lazyStaggeredGridScrollEndLength
+                    }
                 }
             }
-        }
-        is FadingEdgesContentType.LazyList -> {
-            with(contentType) {
-                var scrollStartLength by remember { mutableStateOf(0.0F) }
-                var scrollEndLength by remember { mutableStateOf(0.0F) }
 
-                val layoutInfo = lazyListState.layoutInfo
-                val lazyListScrollStartLength by derivedStateOf {
-                    val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
-                        0.0F
-                    } else {
-                        when (scrollConfig) {
-                            is FadingEdgesScrollConfig.Dynamic -> {
-                                val firstItem = layoutInfo.visibleItemsInfo.first()
-
-                                if (firstItem.index > 0) {
-                                    1.0F
-                                } else {
-                                    val firstItemSize = firstItem.size
-                                    val minLength = if (firstItemSize == 0) {
-                                        lengthPx
-                                    } else {
-                                        min(lengthPx, firstItemSize.toFloat())
-                                    }
-
-                                    var lerpLength = minLength
-
-                                    if (scrollConfig.isLerpByDifferenceForPartialContent &&
-                                        firstItem.index == 0 &&
-                                        lazyListState.canScrollBackward &&
-                                        layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
-                                    ) {
-                                        lerpLength = lerpLazyListPartialContentByDifference(
-                                            layoutInfo = layoutInfo,
-                                            lerpLength = lerpLength,
-                                            minLength = minLength
-                                        )
-                                    }
-
-                                    abs(firstItem.offset).toFloat() / lerpLength * scrollConfig.scrollFactor
-                                }
-                            }
-                            is FadingEdgesScrollConfig.Full -> {
-                                if (lazyListState.canScrollBackward) {
-                                    1.0F
-                                } else {
-                                    0.0F
-                                }
-                            }
-                            is FadingEdgesScrollConfig.Static -> {
-                                if (lazyListState.canScrollForward || lazyListState.canScrollBackward) {
-                                    1.0F
-                                } else {
-                                    0.0F
-                                }
-                            }
-                        }
-                    }.coerceIn(0.0F, 1.0F)
-
-                    fraction * lengthPx
-                }
-                val lazyListScrollEndLength by derivedStateOf {
-                    val fraction = if (layoutInfo.visibleItemsInfo.isEmpty()) {
-                        0.0F
-                    } else {
-                        when (scrollConfig) {
-                            is FadingEdgesScrollConfig.Dynamic -> {
-                                val lastItem = layoutInfo.visibleItemsInfo.last()
-
-                                if (lastItem.index < layoutInfo.totalItemsCount - 1) {
-                                    1.0F
-                                } else {
-                                    val lastItemSize = lastItem.size
-                                    val minLength = if (lastItemSize == 0) {
-                                        lengthPx
-                                    } else {
-                                        min(lengthPx, lastItemSize.toFloat())
-                                    }
-
-                                    var lerpLength = minLength
-
-                                    if (scrollConfig.isLerpByDifferenceForPartialContent &&
-                                        lastItem.index == layoutInfo.totalItemsCount - 1 &&
-                                        lazyListState.canScrollForward &&
-                                        layoutInfo.totalItemsCount == layoutInfo.visibleItemsInfo.size
-                                    ) {
-                                        lerpLength = lerpLazyListPartialContentByDifference(
-                                            layoutInfo = layoutInfo,
-                                            lerpLength = lerpLength,
-                                            minLength = minLength
-                                        )
-                                    }
-
-                                    val lastItemOffset = lastItem.size + lastItem.offset + layoutInfo.beforeContentPadding - layoutInfo.viewportEndOffset
-
-                                    lastItemOffset / lerpLength * scrollConfig.scrollFactor
-                                }
-                            }
-                            is FadingEdgesScrollConfig.Full -> {
-                                if (lazyListState.canScrollForward) {
-                                    1.0F
-                                } else {
-                                    0.0F
-                                }
-                            }
-                            is FadingEdgesScrollConfig.Static -> {
-                                if (lazyListState.canScrollForward || lazyListState.canScrollBackward) {
-                                    1.0F
-                                } else {
-                                    0.0F
-                                }
-                            }
-                        }
-                    }.coerceIn(0.0F, 1.0F)
-
-                    fraction * lengthPx
-                }
-
-                scrollStartLength = lazyListScrollStartLength
-                scrollEndLength = lazyListScrollEndLength
-
-                val animationSpec = scrollConfig.animationSpec
-                if (animationSpec == null) {
-                    startLength = scrollStartLength
-                    endLength = scrollEndLength
-                } else {
-                    startLength = animateFloatAsState(
-                        targetValue = scrollStartLength,
-                        animationSpec = animationSpec
-                    ).value
-                    endLength = animateFloatAsState(
-                        targetValue = scrollEndLength,
-                        animationSpec = animationSpec
-                    ).value
-                }
+            val animationSpec = contentType.scrollConfig.animationSpec
+            if (animationSpec == null) {
+                startLength = scrollStartLength
+                endLength = scrollEndLength
+            } else {
+                startLength = animateFloatAsState(
+                    targetValue = scrollStartLength,
+                    animationSpec = animationSpec,
+                    label = "StartLength"
+                ).value
+                endLength = animateFloatAsState(
+                    targetValue = scrollEndLength,
+                    animationSpec = animationSpec,
+                    label = "EndLength"
+                ).value
             }
         }
         is FadingEdgesContentType.Static -> {
@@ -615,6 +1012,7 @@ internal fun Modifier.fadingEdges(
  * @param minLength The minimum fading edges length.
  * @return The interpolated fading edges length difference.
  * @see FadingEdgesScrollConfig.Dynamic
+ * @see FadingEdgesContentType.Dynamic.Lazy.List
  * @see FadingEdgesScrollConfigDefaults.Dynamic.IsLerpByDifferenceForPartialContent
  * @author GIGAMOLE
  */
@@ -627,6 +1025,118 @@ internal fun lerpLazyListPartialContentByDifference(
             beforeContentPadding +
             afterContentPadding +
             mainAxisItemSpacing * (visibleItemsInfo.size - 1)
+
+    val side = when (orientation) {
+        Orientation.Vertical -> {
+            viewportSize.height
+        }
+        Orientation.Horizontal -> {
+            viewportSize.width
+        }
+    }
+
+    if (visibleSize > side && visibleSize <= side + minLength) {
+        val finalLength = (visibleSize - side).toFloat()
+
+        if (finalLength > 0) {
+            return@with finalLength
+        }
+    }
+
+    lerpLength
+}
+
+/**
+ * Interpolates the fading edges length difference in partial content state.
+ *
+ * @param layoutInfo The [LazyGridItemInfo].
+ * @param spanCount The grid span count.
+ * @param lerpLength The default partial content fading edges length difference.
+ * @param minLength The minimum fading edges length.
+ * @return The interpolated fading edges length difference.
+ * @see FadingEdgesScrollConfig.Dynamic
+ * @see FadingEdgesContentType.Dynamic.Lazy.Grid
+ * @see FadingEdgesScrollConfigDefaults.Dynamic.IsLerpByDifferenceForPartialContent
+ * @author GIGAMOLE
+ */
+internal fun lerpLazyGridPartialContentByDifference(
+    layoutInfo: LazyGridLayoutInfo,
+    spanCount: Int,
+    lerpLength: Float,
+    minLength: Float
+): Float = with(layoutInfo) {
+    val entriesCount = ceil(totalItemsCount.toFloat() / spanCount.toFloat()).toInt()
+    val visibleSize = visibleItemsInfo.chunked(size = spanCount) { chunk ->
+        chunk.maxOf {
+            when (orientation) {
+                Orientation.Vertical -> {
+                    it.size.height
+                }
+                Orientation.Horizontal -> {
+                    it.size.width
+                }
+            }
+        }
+    }.sum() +
+            beforeContentPadding +
+            afterContentPadding +
+            mainAxisItemSpacing * (entriesCount - 1)
+
+    val side = when (orientation) {
+        Orientation.Vertical -> {
+            viewportSize.height
+        }
+        Orientation.Horizontal -> {
+            viewportSize.width
+        }
+    }
+
+    if (visibleSize > side && visibleSize <= side + minLength) {
+        val finalLength = (visibleSize - side).toFloat()
+
+        if (finalLength > 0) {
+            return@with finalLength
+        }
+    }
+
+    lerpLength
+}
+
+/**
+ * Interpolates the fading edges length difference in partial content state.
+ *
+ * @param layoutInfo The [LazyStaggeredGridLayoutInfo].
+ * @param lerpLength The default partial content fading edges length difference.
+ * @param minLength The minimum fading edges length.
+ * @return The interpolated fading edges length difference.
+ * @see FadingEdgesScrollConfig.Dynamic
+ * @see FadingEdgesContentType.Dynamic.Lazy.Grid
+ * @see FadingEdgesScrollConfigDefaults.Dynamic.IsLerpByDifferenceForPartialContent
+ * @author GIGAMOLE
+ */
+internal fun lerpLazyStaggeredGridPartialContentByDifference(
+    layoutInfo: LazyStaggeredGridLayoutInfo,
+    lerpLength: Float,
+    minLength: Float
+): Float = with(layoutInfo) {
+    val maxVisibleLaneInfo = visibleItemsInfo
+        .groupBy { it.lane }
+        .map { entry ->
+            entry.value.size to entry.value.sumOf {
+                when (orientation) {
+                    Orientation.Vertical -> {
+                        it.size.height
+                    }
+                    Orientation.Horizontal -> {
+                        it.size.width
+                    }
+                }
+            }
+        }.maxBy { it.second }
+    val visibleSize = maxVisibleLaneInfo.second +
+            beforeContentPadding +
+            afterContentPadding +
+            mainAxisItemSpacing * (maxVisibleLaneInfo.first - 1)
 
     val side = when (orientation) {
         Orientation.Vertical -> {

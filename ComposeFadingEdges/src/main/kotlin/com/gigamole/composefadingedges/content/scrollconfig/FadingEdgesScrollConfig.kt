@@ -2,15 +2,14 @@ package com.gigamole.composefadingedges.content.scrollconfig
 
 import androidx.compose.animation.core.AnimationSpec
 import com.gigamole.composefadingedges.content.FadingEdgesContentType
-import com.gigamole.composefadingedges.content.scrollconfig.FadingEdgesScrollConfig.Dynamic
 import com.gigamole.composefadingedges.fadingEdges
 import com.gigamole.composefadingedges.lerpLazyListPartialContentByDifference
 
 /**
- * The fading edges scroll config for [FadingEdgesContentType.Scroll] and [FadingEdgesContentType.LazyList] types.
+ * The fading edges scroll config for [FadingEdgesContentType.Dynamic] types.
  *
  * The ComposeFadingEdges advises using an animation (custom or default [FadingEdgesScrollConfigDefaults.AnimationSpec]) to provide an interactive fading edges size
- * transitions (due to the dynamic items size or partial content). Especially useful for [Dynamic].
+ * transitions (due to the dynamic items size or partial content).
  *
  * @see FadingEdgesContentType
  * @see fadingEdges
@@ -24,9 +23,9 @@ sealed interface FadingEdgesScrollConfig {
      * The dynamic fading edges scroll configuration interpolates their lengths on the scroll offset. The fading edges fade in when the content is away from the edges and
      * fade out as it gets closer. The fading edges are fully hidden when the content size is not scrollable.
      *
-     * The [isLerpByDifferenceForPartialContent] functionality is useful when the [FadingEdgesContentType.Scroll] or [FadingEdgesContentType.LazyList] combined content
-     * size (items size and offset) is slightly larger than the viewport size but smaller than the fading edges length. By enabling this feature, the fading edges can
-     * smoothly interpolate their scroll offset length by considering the partial content difference, rather than fading edges length.
+     * The [isLerpByDifferenceForPartialContent] functionality is useful when the [FadingEdgesContentType.Dynamic] combined content size (items size and offset) is
+     * slightly larger than the viewport size but smaller than the fading edges length. By enabling this feature, the fading edges can smoothly interpolate their scroll
+     * offset length by considering the partial content difference, rather than fading edges length.
      *
      * @property animationSpec The fading edges scroll animation specification.
      * @property isLerpByDifferenceForPartialContent Determines whether the fading edges should interpolate their scroll offset length for partial content.

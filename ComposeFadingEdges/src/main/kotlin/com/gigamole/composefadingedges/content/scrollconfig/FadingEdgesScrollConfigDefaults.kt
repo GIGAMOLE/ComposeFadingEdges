@@ -29,9 +29,9 @@ object FadingEdgesScrollConfigDefaults {
         /**
          * Determines whether the fading edges should interpolate their scroll offset length for partial content.
          *
-         * This functionality is useful when the [FadingEdgesContentType.Scroll] or [FadingEdgesContentType.LazyList] combined content size (items size and offset) is
-         * slightly larger than the viewport size but smaller than the fading edges length. By enabling this feature, the fading edges can smoothly interpolate their
-         * scroll offset length by considering the partial content difference, rather than fading edges length.
+         * This functionality is useful when the [FadingEdgesContentType.Dynamic] combined content size (items size and offset) is slightly larger than the viewport size
+         * but smaller than the fading edges length. By enabling this feature, the fading edges can smoothly interpolate their scroll offset length by considering the
+         * partial content difference, rather than fading edges length.
          *
          * @see FadingEdgesDefaults
          * @see fadingEdges

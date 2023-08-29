@@ -33,7 +33,15 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -52,6 +60,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -174,8 +184,8 @@ fun MainScreenDemoContent() {
                 modifier = Modifier
                     .height(height = 170.dp)
                     .verticalFadingEdges(
-                        contentType = FadingEdgesContentType.Scroll(
-                            scrollState = scrollState,
+                        contentType = FadingEdgesContentType.Dynamic.Scroll(
+                            state = scrollState,
                             scrollConfig = fadingEdgesScrollConfig
                         )
                     )
@@ -237,31 +247,40 @@ fun MainScreenContent() {
     val rawStaticScrollState = rememberScrollState()
     val rawScrollState = rememberScrollState()
     val rawLazyListState = rememberLazyListState()
+    val rawLazyGridState = rememberLazyGridState()
+    val rawLazyStaggeredGridState = rememberLazyStaggeredGridState()
     val configScrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
 
     var sampleContentType by remember { mutableStateOf(SampleContentType.Static) }
-    var itemsCount by remember { mutableStateOf(10) }
+    var itemsCount by remember { mutableIntStateOf(10) }
+    var gridItemsCount by remember { mutableIntStateOf(20) }
     var itemAdditionalSize by remember { mutableStateOf(0.dp) }
     var itemsSpacing by remember { mutableStateOf(0.dp) }
     var itemsRandomHeight by remember { mutableStateOf(false) }
+    var isColorPickerVisible by remember { mutableStateOf(false) }
+    var randomSeed by remember { mutableIntStateOf(0) }
+    var fadingEdgesSampleGridSpanCount by remember { mutableStateOf(SampleGridSpanCount.Span_2) }
 
     var fadingEdgesOrientation by remember { mutableStateOf(FadingEdgesOrientation.Vertical) }
     var fadingEdgesGravity by remember { mutableStateOf(FadingEdgesDefaults.Gravity) }
     var fadingEdgesLength by remember { mutableStateOf(FadingEdgesDefaults.Length) }
     var fadingEdgesSampleScrollConfig by remember { mutableStateOf(SampleScrollConfig.Static) }
     var fadingEdgesSampleAnimationType by remember { mutableStateOf(SampleAnimationType.Spring) }
-    var fadingEdgesDynamicScrollFactor by remember { mutableStateOf(FadingEdgesScrollConfigDefaults.Dynamic.ScrollFactor) }
+    var fadingEdgesDynamicScrollFactor by remember { mutableFloatStateOf(FadingEdgesScrollConfigDefaults.Dynamic.ScrollFactor) }
     var fadingEdgesDynamicIsLerpByDifferenceForPartialContent by remember { mutableStateOf(FadingEdgesScrollConfigDefaults.Dynamic.IsLerpByDifferenceForPartialContent) }
     var fadingEdgesSampleFillType by remember { mutableStateOf(SampleFillType.Clip) }
-    var fadingEdgesFillStopFirst by remember { mutableStateOf(FadingEdgesFillTypeDefaults.FillStops.first) }
-    var fadingEdgesFillStopSecond by remember { mutableStateOf(FadingEdgesFillTypeDefaults.FillStops.second) }
-    var fadingEdgesFillStopThird by remember { mutableStateOf(FadingEdgesFillTypeDefaults.FillStops.third) }
-    var fadingEdgesFillSecondStopAlpha by remember { mutableStateOf(FadingEdgesFillTypeDefaults.SecondStopAlpha) }
+    var fadingEdgesFillStopFirst by remember { mutableFloatStateOf(FadingEdgesFillTypeDefaults.FillStops.first) }
+    var fadingEdgesFillStopSecond by remember { mutableFloatStateOf(FadingEdgesFillTypeDefaults.FillStops.second) }
+    var fadingEdgesFillStopThird by remember { mutableFloatStateOf(FadingEdgesFillTypeDefaults.FillStops.third) }
+    var fadingEdgesFillSecondStopAlpha by remember { mutableFloatStateOf(FadingEdgesFillTypeDefaults.SecondStopAlpha) }
     var fadingEdgesColor by remember { mutableStateOf(FadingEdgesFillTypeDefaults.FadeColor.FadeColor) }
-    var isColorPickerVisible by remember { mutableStateOf(false) }
-    var randomSeed by remember { mutableStateOf(0) }
 
+    val fadingEdgesGridSpanCount by remember(fadingEdgesSampleGridSpanCount) {
+        derivedStateOf {
+            fadingEdgesSampleGridSpanCount.spanCount
+        }
+    }
     val fadingEdgesScrollAnimationSpec: AnimationSpec<Float>? by remember(fadingEdgesSampleAnimationType) {
         derivedStateOf {
             when (fadingEdgesSampleAnimationType) {
@@ -304,7 +323,8 @@ fun MainScreenContent() {
 
     val fadingEdgesContentType by remember(
         sampleContentType,
-        fadingEdgesScrollConfig
+        fadingEdgesScrollConfig,
+        fadingEdgesGridSpanCount
     ) {
         derivedStateOf {
             when (sampleContentType) {
@@ -312,15 +332,29 @@ fun MainScreenContent() {
                     FadingEdgesContentType.Static
                 }
                 SampleContentType.Scroll -> {
-                    FadingEdgesContentType.Scroll(
-                        scrollState = rawScrollState,
+                    FadingEdgesContentType.Dynamic.Scroll(
+                        state = rawScrollState,
                         scrollConfig = fadingEdgesScrollConfig
                     )
                 }
                 SampleContentType.LazyList -> {
-                    FadingEdgesContentType.LazyList(
-                        lazyListState = rawLazyListState,
+                    FadingEdgesContentType.Dynamic.Lazy.List(
+                        state = rawLazyListState,
                         scrollConfig = fadingEdgesScrollConfig
+                    )
+                }
+                SampleContentType.LazyGrid -> {
+                    FadingEdgesContentType.Dynamic.Lazy.Grid(
+                        state = rawLazyGridState,
+                        scrollConfig = fadingEdgesScrollConfig,
+                        spanCount = fadingEdgesGridSpanCount
+                    )
+                }
+                SampleContentType.LazyStgrGrid -> {
+                    FadingEdgesContentType.Dynamic.Lazy.StaggeredGrid(
+                        state = rawLazyStaggeredGridState,
+                        scrollConfig = fadingEdgesScrollConfig,
+                        spanCount = fadingEdgesGridSpanCount
                     )
                 }
             }
@@ -376,16 +410,27 @@ fun MainScreenContent() {
             rawLazyListState.scrollToItem(0)
         }
         coroutineScope.launch {
+            rawLazyGridState.scrollToItem(0)
+        }
+        coroutineScope.launch {
+            rawLazyStaggeredGridState.scrollToItem(0)
+        }
+        coroutineScope.launch {
             configScrollState.scrollTo(0)
         }
     }
 
     fun reset() {
         sampleContentType = SampleContentType.Static
+
         itemsCount = 10
+        gridItemsCount = 20
         itemAdditionalSize = 0.dp
         itemsSpacing = 0.dp
         itemsRandomHeight = false
+        isColorPickerVisible = false
+        fadingEdgesSampleGridSpanCount = SampleGridSpanCount.Span_2
+
         fadingEdgesOrientation = FadingEdgesOrientation.Vertical
         fadingEdgesGravity = FadingEdgesDefaults.Gravity
         fadingEdgesLength = FadingEdgesDefaults.Length
@@ -399,7 +444,6 @@ fun MainScreenContent() {
         fadingEdgesFillStopThird = FadingEdgesFillTypeDefaults.FillStops.third
         fadingEdgesFillSecondStopAlpha = FadingEdgesFillTypeDefaults.SecondStopAlpha
         fadingEdgesColor = FadingEdgesFillTypeDefaults.FadeColor.FadeColor
-        isColorPickerVisible = false
 
         coroutineScope.launch {
             resetScrolls()
@@ -419,7 +463,7 @@ fun MainScreenContent() {
             val random = Random(index + randomSeed)
 
             if (random.nextFloat() >= 0.1F) {
-                100.dp * random.nextFloat()
+                65.dp + 200.dp * random.nextFloat()
             } else {
                 400.dp
             }
@@ -477,7 +521,8 @@ fun MainScreenContent() {
                 .aspectRatio(ratio = 0.95F)
                 .padding(all = 20.dp)
                 .clipToBounds(),
-            targetState = sampleContentType to fadingEdgesOrientation
+            targetState = sampleContentType to fadingEdgesOrientation,
+            label = "ContentTypeCrossafe"
         ) { (sampleScrollTypeState, fadingEdgesOrientationState) ->
             when (sampleScrollTypeState) {
                 SampleContentType.Scroll -> {
@@ -576,6 +621,106 @@ fun MainScreenContent() {
                         }
                     }
                 }
+                SampleContentType.LazyGrid -> {
+                    when (fadingEdgesOrientationState) {
+                        FadingEdgesOrientation.Vertical -> {
+                            LazyVerticalGrid(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalFadingEdges(
+                                        contentType = fadingEdgesContentType,
+                                        gravity = fadingEdgesGravity,
+                                        length = fadingEdgesLength,
+                                        fillType = fadingEdgesFillType
+                                    ),
+                                contentPadding = PaddingValues(vertical = itemsSpacing),
+                                state = rawLazyGridState,
+                                verticalArrangement = Arrangement.spacedBy(space = itemsSpacing),
+                                columns = GridCells.Fixed(count = fadingEdgesGridSpanCount)
+                            ) {
+                                items(gridItemsCount) {
+                                    SampleItem(
+                                        index = it,
+                                        orientation = fadingEdgesOrientationState
+                                    )
+                                }
+                            }
+                        }
+                        FadingEdgesOrientation.Horizontal -> {
+                            LazyHorizontalGrid(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .horizontalFadingEdges(
+                                        contentType = fadingEdgesContentType,
+                                        gravity = fadingEdgesGravity,
+                                        length = fadingEdgesLength,
+                                        fillType = fadingEdgesFillType
+                                    ),
+                                contentPadding = PaddingValues(horizontal = itemsSpacing),
+                                state = rawLazyGridState,
+                                horizontalArrangement = Arrangement.spacedBy(space = itemsSpacing),
+                                rows = GridCells.Fixed(count = fadingEdgesGridSpanCount)
+                            ) {
+                                items(gridItemsCount) {
+                                    SampleItem(
+                                        index = it,
+                                        orientation = fadingEdgesOrientationState
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                SampleContentType.LazyStgrGrid -> {
+                    when (fadingEdgesOrientationState) {
+                        FadingEdgesOrientation.Vertical -> {
+                            LazyVerticalStaggeredGrid(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .verticalFadingEdges(
+                                        contentType = fadingEdgesContentType,
+                                        gravity = fadingEdgesGravity,
+                                        length = fadingEdgesLength,
+                                        fillType = fadingEdgesFillType
+                                    ),
+                                contentPadding = PaddingValues(vertical = itemsSpacing),
+                                state = rawLazyStaggeredGridState,
+                                verticalItemSpacing = itemsSpacing,
+                                columns = StaggeredGridCells.Fixed(count = fadingEdgesGridSpanCount)
+                            ) {
+                                items(gridItemsCount) {
+                                    SampleItem(
+                                        index = it,
+                                        orientation = fadingEdgesOrientationState
+                                    )
+                                }
+                            }
+                        }
+                        FadingEdgesOrientation.Horizontal -> {
+                            LazyHorizontalStaggeredGrid(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .horizontalFadingEdges(
+                                        contentType = fadingEdgesContentType,
+                                        gravity = fadingEdgesGravity,
+                                        length = fadingEdgesLength,
+                                        fillType = fadingEdgesFillType
+                                    ),
+                                contentPadding = PaddingValues(horizontal = itemsSpacing),
+                                state = rawLazyStaggeredGridState,
+                                horizontalItemSpacing = itemsSpacing,
+                                rows = StaggeredGridCells.Fixed(count = fadingEdgesGridSpanCount)
+                            ) {
+                                items(gridItemsCount) {
+                                    SampleItem(
+                                        index = it,
+                                        orientation = fadingEdgesOrientationState
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
                 SampleContentType.Static -> {
                     when (fadingEdgesOrientationState) {
                         FadingEdgesOrientation.Vertical -> {
@@ -653,18 +798,67 @@ fun MainScreenContent() {
                 .padding(all = 20.dp),
             verticalArrangement = Arrangement.spacedBy(space = 4.dp)
         ) {
+            if (sampleContentType.isLazyGridOrStgrGrid) {
+                Text(
+                    text = "SPAN COUNT:",
+                    style = MaterialTheme.typography.labelLarge
+                )
+                TabRow(
+                    selectedTabIndex = fadingEdgesSampleGridSpanCount.ordinal,
+                    modifier = Modifier.fillMaxWidth(),
+                    tabs = {
+                        SampleGridSpanCount.values().forEach { enumValue ->
+                            Tab(
+                                selected = enumValue == fadingEdgesSampleGridSpanCount,
+                                text = {
+                                    Text(
+                                        modifier = Modifier.basicMarquee(),
+                                        text = enumValue.name.uppercase(),
+                                        maxLines = 1
+                                    )
+                                },
+                                onClick = {
+                                    fadingEdgesSampleGridSpanCount = enumValue
+                                },
+                            )
+                        }
+                    }
+                )
+            }
+
+            val endValueRange = if (sampleContentType.isLazyGridOrStgrGrid) {
+                40
+            } else {
+                20
+            }
+
             Text(
+                modifier = Modifier.padding(
+                    top = if (sampleContentType.isLazyGridOrStgrGrid) {
+                        20.dp
+                    } else {
+                        0.dp
+                    }
+                ),
                 text = "ITEMS COUNT:",
                 style = MaterialTheme.typography.labelLarge
             )
             Slider(
                 modifier = Modifier.fillMaxWidth(),
-                value = itemsCount.toFloat(),
-                onValueChange = {
-                    itemsCount = it.toInt()
+                value = if (sampleContentType.isLazyGridOrStgrGrid) {
+                    gridItemsCount.toFloat()
+                } else {
+                    itemsCount.toFloat()
                 },
-                valueRange = 0.0F..20.0F,
-                steps = 20
+                onValueChange = {
+                    if (sampleContentType.isLazyGridOrStgrGrid) {
+                        gridItemsCount = it.toInt()
+                    } else {
+                        itemsCount = it.toInt()
+                    }
+                },
+                valueRange = 0.0F..endValueRange.toFloat(),
+                steps = endValueRange
             )
 
             Text(
@@ -1047,7 +1241,12 @@ fun MainScreenContent() {
 enum class SampleContentType {
     Static,
     Scroll,
-    LazyList
+    LazyList,
+    LazyGrid,
+    LazyStgrGrid;
+
+    val isLazyGridOrStgrGrid: Boolean
+        get() = this == LazyGrid || this == LazyStgrGrid
 }
 
 enum class SampleScrollConfig {
@@ -1056,6 +1255,7 @@ enum class SampleScrollConfig {
     Full
 }
 
+@Suppress("EnumEntryName")
 enum class SampleAnimationType {
     None,
     Spring,
@@ -1065,4 +1265,11 @@ enum class SampleAnimationType {
 enum class SampleFillType {
     Clip,
     Color
+}
+
+@Suppress("EnumEntryName")
+enum class SampleGridSpanCount(val spanCount: Int) {
+    Span_1(1),
+    Span_2(2),
+    Span_3(3)
 }

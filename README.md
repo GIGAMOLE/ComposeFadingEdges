@@ -12,10 +12,10 @@ The `ComposeFadingEdges` is a powerful Android Compose library that seamlessly i
 Features:
 
 - **Multiple Modifiers:** Add fading edges with custom orientation, gravity, length, content and fill type.
-- **Different Contents:** Support for static, scrollable, and lazy list content types.
+- **Scrolls States:** Ready for `ScrollState`, `LazyListState`, `LazyGridState`, `LazyStaggeredGridState`.
 - **Scrolling Settings:** Configure fading edges scroll behavior with dynamic, full, or static settings.
-- **Adjustable Fade:** Choose between fade clip or fade color fill types for fading edges.
 - **Text Marquee:** Easily add fading edges to text marquee with automatic layout alignment.
+- **Adjustable Fade:** Choose between fade clip or fade color fill types for fading edges.
 - **Sample App:** Explore and experiment with [sample app](#sample-app).
 
 ## Sample App
@@ -53,8 +53,8 @@ Also, it's possible to download the latest artifact from the [releases page](htt
 
 ## Guide
 
-The `ComposeFadingEdges` comes with multiple `Modifiers`: [`Modifier.horizontalFadingEdges(...)`](#Fading-Edges-Modifiers)
-, [`Modifier.verticalFadingEdges(...)`](#Fading-Edges-Modifiers), etc.
+The `ComposeFadingEdges` comes with multiple `Modifiers`: [`Modifier.horizontalFadingEdges(...)`](#fading-edges-modifiers)
+, [`Modifier.verticalFadingEdges(...)`](#fading-edges-modifiers), etc.
 
 For more technical and detailed documentation, read the library `KDoc`.
 
@@ -67,8 +67,8 @@ The fading edges `Modifiers` are available for different content orientation and
 |`orientation`|The fading edges orientation: `Horizontal` or `Vertical`.|
 |`gravity`|The fading edges gravity: `All`, `Start`, or `End`.|
 |`length`|The fading edges length.|
-|`contentType`|The [`FadingEdgesContentType`](#FadingEdgesContentType).|
-|`fillType`|The [`FadingEdgesFillType`](#FadingEdgesFillType).|
+|`contentType`|The [`FadingEdgesContentType`](#fadingedgescontentType).|
+|`fillType`|The [`FadingEdgesFillType`](#fadingedgesfilltype).|
 
 In case, `contentType` is not provided, the `FadingEdgesContentType` equals to `Static`.
 
@@ -76,9 +76,16 @@ The `ComposeFadingEdges` also provides fading edges for [text marquee](#modifier
 
 ### FadingEdgesContentType
 
-The `FadingEdgesContentType` can be `Static`, `Scroll` or `LazyList`.
+The `FadingEdgesContentType` can be `Static` or `Dynamic`.
 
-The `Scroll`/`LazyList` content type require `ScrollState`/`LazyListState` and [`FadingEdgesScrollConfig`](#FadingEdgesScrollConfig).
+The `Dynamic` content sub-type can be the following:
+
+- `Scroll`: The dynamic fading edges for a `ScrollState` content.
+- `Lazy.List`: The dynamic fading edges for a `LazyListState` content.
+- `Lazy.Grid`: The dynamic fading edges for a `LazyGridState` content.
+- `Lazy.StaggeredGrid`: The dynamic fading edges for a `LazyStaggeredGridState` content.
+
+The `Dynamic` content type requires [`FadingEdgesScrollConfig`](#fadingedgesscrollconfig).
 
 #### FadingEdgesScrollConfig
 
@@ -109,7 +116,7 @@ The `FadeColor` type requires a `color` param and draws the fading edges fill gr
 
 The utility `Modifier` to add fading edges to the text marquee (custom or default `basicMarquee`).
 
-This `Modifier` comes with common [fading edges params](#Fading-Edges-Modifiers) and a few additional params:
+This `Modifier` comes with common [fading edges params](#fading-edges-modifiers) and a few additional params:
 
 |Param|Description|
 |-|-|

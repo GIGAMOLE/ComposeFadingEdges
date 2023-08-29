@@ -25,7 +25,7 @@ object FadingEdgesFillTypeDefaults {
      *
      * @see SecondStopAlpha
      */
-    val SecondStopAlpha: Float = 0.5F
+    const val SecondStopAlpha: Float = 0.5F
 
     /** The default values for [FadingEdgesFillType.FadeColor]. */
     object FadeColor {
