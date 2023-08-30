@@ -21,7 +21,8 @@ object FadingEdgesScrollConfigDefaults {
      * The ComposeFadingEdges advises using an animation (custom or default [AnimationSpec]) to provide an interactive fading edges size transitions (due to the dynamic
      * items size or partial content). Especially useful when [Dynamic.IsLerpByDifferenceForPartialContent] is enabled.
      */
-    val AnimationSpec: AnimationSpec<Float> = spring()
+    val AnimationSpec: AnimationSpec<Float>
+        get() = spring()
 
     /** The default values for [FadingEdgesScrollConfig.Dynamic] type. */
     object Dynamic {
