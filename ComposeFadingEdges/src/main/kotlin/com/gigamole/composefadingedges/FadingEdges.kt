@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -37,7 +38,9 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import com.gigamole.composefadingedges.content.FadingEdgesContentType
 import com.gigamole.composefadingedges.content.scrollconfig.FadingEdgesScrollConfig
@@ -56,13 +59,17 @@ import kotlin.math.min
  * When [isMarqueeAutoLayout] is enabled, the origin width is extended based on the provided [length] and [gravity], while maintaining the same offset. This ensures that
  * when fading edges [length] paddings are applied to the marquee text, the text remains positioned at its origin location. It is important to leave sufficient free space
  * around the marquee to ensure the effect is drawn correctly. On the other hand, when [isMarqueeAutoLayout] is disabled, the fading edges length paddings are applied to
- * the marquee text, and the origin position is offset by the [length]. In this case, you need to manually handle this padding offset.
+ * the marquee text, and the origin position is offset by the [length]. In this case, you need to manually handle this padding offset. In the [isMarqueeAutoLayout] the
+ * [isMarqueeAutoPadding] is automatically true.
+ *
+ * When the text content is unfit, the marquee and [horizontalFadingEdges] will not be applied.
  *
  * @param gravity The [FadingEdgesGravity].
  * @param length The fading edges length.
  * @param fillType The [FadingEdgesFillType].
  * @param isMarqueeAutoLayout Determines whether the [horizontalFadingEdges] and text marquee should be automatically aligned during the layout process to accommodate
  *     additional text paddings required for proper fading edges drawing.
+ * @param isMarqueeAutoPadding Determines if padding values according to the [gravity] and [length] should be applied.
  * @param marqueeProvider The custom or default [basicMarquee] provider.
  * @return The [Modifier] with extended width in case of [isMarqueeAutoLayout] is enabled, [horizontalFadingEdges], provided marquee with [marqueeProvider], and
  *     additional horizontal paddings.
@@ -73,21 +80,39 @@ fun Modifier.marqueeHorizontalFadingEdges(
     length: Dp = FadingEdgesDefaults.Length,
     fillType: FadingEdgesFillType = FadingEdgesDefaults.FillType,
     isMarqueeAutoLayout: Boolean = FadingEdgesDefaults.IsMarqueeAutoLayout,
-    marqueeProvider: Modifier.() -> Modifier
-): Modifier =
-    then(
-        if (isMarqueeAutoLayout) {
-            Modifier.layout { measurable, constraints ->
-                val lengthPx = length.roundToPx()
-                val widthLength = when (gravity) {
-                    FadingEdgesGravity.All -> {
-                        lengthPx * 2
-                    }
-                    FadingEdgesGravity.Start,
-                    FadingEdgesGravity.End -> {
-                        lengthPx
-                    }
+    isMarqueeAutoPadding: Boolean = FadingEdgesDefaults.IsMarqueeAutoPadding,
+    marqueeProvider: () -> Modifier
+): Modifier = composed {
+    var isMarqueeAndFadingEdgesVisible by remember { mutableStateOf(false) }
+    var isMarqueeAutoLayoutApplied by remember { mutableStateOf(false) }
+
+    Modifier
+        .layout { measurable, constraints ->
+            val lengthPx = length.roundToPx()
+            val widthLength = when (gravity) {
+                FadingEdgesGravity.All -> {
+                    lengthPx * 2
                 }
+                FadingEdgesGravity.Start,
+                FadingEdgesGravity.End -> {
+                    lengthPx
+                }
+            }
+
+            val contentConstraints = constraints.copy(maxWidth = Constraints.Infinity)
+            val contentPlaceable = measurable.measure(contentConstraints)
+            val containerWidth = constraints.constrainWidth(contentPlaceable.width)
+            val contentWidth = contentPlaceable.width -
+                    if (isMarqueeAutoLayout && isMarqueeAutoLayoutApplied) {
+                        widthLength
+                    } else {
+                        0
+                    }
+
+            isMarqueeAndFadingEdgesVisible = contentWidth > containerWidth
+
+            if (isMarqueeAutoLayout && isMarqueeAndFadingEdgesVisible) {
+                isMarqueeAutoLayoutApplied = true
 
                 // Extend the content width for fading edges and an additional text padding later.
                 val placeable = measurable.measure(
@@ -105,31 +130,54 @@ fun Modifier.marqueeHorizontalFadingEdges(
                         y = 0
                     )
                 }
+            } else {
+                isMarqueeAutoLayoutApplied = false
+
+                val placeable = measurable.measure(constraints)
+
+                layout(
+                    width = placeable.width,
+                    height = placeable.height
+                ) {
+                    placeable.placeWithLayer(
+                        x = 0,
+                        y = 0
+                    )
+                }
             }
-        } else {
-            Modifier
         }
-    )
-        .horizontalFadingEdges(
-            gravity = gravity,
-            length = length,
-            fillType = fillType
-        )
-        .then(marqueeProvider())
         .then(
-            // Applying an additional padding to text, so fading edges dont cover it, at its origin position.
-            when (gravity) {
-                FadingEdgesGravity.All -> {
-                    Modifier.padding(horizontal = length)
-                }
-                FadingEdgesGravity.Start -> {
-                    Modifier.padding(start = length)
-                }
-                FadingEdgesGravity.End -> {
-                    Modifier.padding(end = length)
-                }
+            if (isMarqueeAndFadingEdgesVisible) {
+                Modifier
+                    .horizontalFadingEdges(
+                        gravity = gravity,
+                        length = length,
+                        fillType = fillType
+                    )
+                    .then(marqueeProvider())
+                    .then(
+                        if (isMarqueeAutoLayout || isMarqueeAutoPadding) {
+                            // Applying an additional padding to text, so fading edges dont cover it, at its origin position.
+                            when (gravity) {
+                                FadingEdgesGravity.All -> {
+                                    Modifier.padding(horizontal = length)
+                                }
+                                FadingEdgesGravity.Start -> {
+                                    Modifier.padding(start = length)
+                                }
+                                FadingEdgesGravity.End -> {
+                                    Modifier.padding(end = length)
+                                }
+                            }
+                        } else {
+                            Modifier
+                        }
+                    )
+            } else {
+                Modifier
             }
         )
+}
 
 /**
  * The [Modifier] to add horizontal [fadingEdges] with a [FadingEdgesContentType.Static] content type. The fading edges are always fully shown.

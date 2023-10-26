@@ -121,6 +121,7 @@ This `Modifier` comes with common [fading edges params](#fading-edges-modifiers)
 |Param|Description|
 |-|-|
 |`isMarqueeAutoLayout`|Determines whether the `horizontalFadingEdges(...)` and text marquee should be automatically aligned during the layout process to accommodate additional text paddings required for proper fading edges drawing.|
+|`isMarqueeAutoPadding`|Determines if padding values according to the `gravity` and `length` should be applied.|
 |`marqueeProvider`|The custom or default `basicMarquee` provider.|
 
 ## License

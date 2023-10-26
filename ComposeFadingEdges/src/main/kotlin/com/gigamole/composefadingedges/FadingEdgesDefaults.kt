@@ -29,4 +29,12 @@ object FadingEdgesDefaults {
      * @see marqueeHorizontalFadingEdges
      */
     const val IsMarqueeAutoLayout: Boolean = true
+
+    /**
+     * Determines whether the [horizontalFadingEdges] and horizontal text marquee should apply paddings paddings according to the gravity and length.
+     *
+     * @see marqueeHorizontalFadingEdges
+     */
+    const val IsMarqueeAutoPadding: Boolean = true
+
 }

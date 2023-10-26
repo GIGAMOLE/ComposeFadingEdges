@@ -89,6 +89,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
+private val ALPHANUMERIC = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -212,7 +214,8 @@ fun MainScreenDemoContent() {
                     modifier = Modifier
                         .width(width = 250.dp)
                         .marqueeHorizontalFadingEdges(isMarqueeAutoLayout = false) {
-                            background(color = Color(0xFFFEECF4))
+                            Modifier
+                                .background(color = Color(0xFFFEECF4))
                                 .basicMarquee(
                                     delayMillis = initialDelay.toInt(),
                                     spacing = MarqueeSpacing.fractionOfContainer(fraction = 0.05F),
@@ -275,6 +278,9 @@ fun MainScreenContent() {
     var fadingEdgesFillStopThird by remember { mutableFloatStateOf(FadingEdgesFillTypeDefaults.FillStops.third) }
     var fadingEdgesFillSecondStopAlpha by remember { mutableFloatStateOf(FadingEdgesFillTypeDefaults.SecondStopAlpha) }
     var fadingEdgesColor by remember { mutableStateOf(FadingEdgesFillTypeDefaults.FadeColor.FadeColor) }
+    var fadingEdgesMarqueeTextLength by remember { mutableIntStateOf(50) }
+    var fadingEdgesIsMarqueeAutoLayout by remember { mutableStateOf(FadingEdgesDefaults.IsMarqueeAutoLayout) }
+    var fadingEdgesIsMarqueeAutoPadding by remember { mutableStateOf(FadingEdgesDefaults.IsMarqueeAutoPadding) }
 
     val fadingEdgesGridSpanCount by remember(fadingEdgesSampleGridSpanCount) {
         derivedStateOf {
@@ -292,6 +298,17 @@ fun MainScreenContent() {
                 }
                 SampleAnimationType.Tween_700 -> {
                     tween(durationMillis = 700)
+                }
+            }
+        }
+    }
+    val fadingEdgesMarqueeText by remember(
+        fadingEdgesMarqueeTextLength
+    ) {
+        derivedStateOf {
+            buildString {
+                repeat(fadingEdgesMarqueeTextLength) {
+                    append(ALPHANUMERIC.random())
                 }
             }
         }
@@ -444,6 +461,9 @@ fun MainScreenContent() {
         fadingEdgesFillStopThird = FadingEdgesFillTypeDefaults.FillStops.third
         fadingEdgesFillSecondStopAlpha = FadingEdgesFillTypeDefaults.SecondStopAlpha
         fadingEdgesColor = FadingEdgesFillTypeDefaults.FadeColor.FadeColor
+        fadingEdgesMarqueeTextLength = 50
+        fadingEdgesIsMarqueeAutoLayout = FadingEdgesDefaults.IsMarqueeAutoLayout
+        fadingEdgesIsMarqueeAutoPadding = FadingEdgesDefaults.IsMarqueeAutoPadding
 
         coroutineScope.launch {
             resetScrolls()
@@ -1048,7 +1068,7 @@ fun MainScreenContent() {
                             modifier = Modifier
                                 .weight(weight = 1.0F)
                                 .marqueeHorizontalFadingEdges(length = 8.dp) {
-                                    basicMarquee()
+                                    Modifier.basicMarquee()
                                 },
                             text = "IS LERP BY DIFFERENCE FOR PARTIAL CONTENT:",
                             style = MaterialTheme.typography.labelLarge,
@@ -1205,6 +1225,85 @@ fun MainScreenContent() {
                 Spacer(modifier = Modifier.height(height = 4.dp))
             }
 
+            if (fadingEdgesContentType == FadingEdgesContentType.Static) {
+                Text(
+                    text = "MARQUEE TEXT LENGTH:",
+                    style = MaterialTheme.typography.labelLarge
+                )
+                Slider(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = fadingEdgesMarqueeTextLength.toFloat(),
+                    onValueChange = {
+                        fadingEdgesMarqueeTextLength = it.toInt()
+                    },
+                    valueRange = 0.0F..100.0F,
+                    steps = 11
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.weight(weight = 1.0F),
+                        text = "IS MARQUEE AUTO LAYOUT:",
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1
+                    )
+                    Switch(
+                        modifier = Modifier.padding(start = 8.dp),
+                        checked = fadingEdgesIsMarqueeAutoLayout,
+                        onCheckedChange = {
+                            fadingEdgesIsMarqueeAutoLayout = it
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(space = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier.weight(weight = 1.0F),
+                        text = "IS MARQUEE AUTO PADDING:",
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1
+                    )
+                    Switch(
+                        modifier = Modifier.padding(start = 8.dp),
+                        checked = fadingEdgesIsMarqueeAutoPadding,
+                        onCheckedChange = {
+                            fadingEdgesIsMarqueeAutoPadding = it
+                        }
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                        .border(
+                            color = Color.Red.copy(alpha = 0.25F),
+                            width = 1.dp
+                        )
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .marqueeHorizontalFadingEdges(
+                                gravity = FadingEdgesGravity.All,
+                                length = fadingEdgesLength,
+                                fillType = fadingEdgesFillType,
+                                isMarqueeAutoLayout = fadingEdgesIsMarqueeAutoLayout,
+                                isMarqueeAutoPadding = fadingEdgesIsMarqueeAutoPadding
+                            ) {
+                                Modifier.basicMarquee(iterations = Int.MAX_VALUE)
+                            },
+                        text = fadingEdgesMarqueeText,
+                        style = MaterialTheme.typography.labelLarge,
+                        maxLines = 1
+                    )
+                }
+            }
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
