@@ -1,4 +1,4 @@
-![](/media/header.png)
+![](/media/header-new.png)
 
 ![](https://jitpack.io/v/GIGAMOLE/ComposeFadingEdges.svg?style=flat-square) | [Setup Guide](#setup)
 | [Report new issue](https://github.com/GIGAMOLE/ComposeFadingEdges/issues/new)
