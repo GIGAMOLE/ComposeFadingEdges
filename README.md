@@ -28,13 +28,14 @@ Download or clone this repository to discover the sample app.
 
 ## Setup
 
-Add to the root `build.gradle.kts`:
+Add to the root `settings.gradle.kts`:
 
 ``` groovy
-allprojects {
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        ...
-        maven("https://jitpack.io")
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 ```
